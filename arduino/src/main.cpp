@@ -5,28 +5,18 @@
 const int PIN_SERIAL_RX = 15;
 const int PIN_SERIAL_TX = 14;
 
-const static uint8_t NUM_LEDS = 73;
+const static uint8_t NUM_LEDS = 12;
 
-const static uint8_t LEDS_FOOD_READY[] = {
-  1, 2, 3, 4, 5, 6, 7, 8,
-              53, 54, 55, 56, 57, 58, 59,
-  60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
-  70, 71, 72
-};
+const static uint8_t LEDS_FRONT[] = {0, 2, 4, 6, 8, 10};
 
-const static uint8_t LEDS_LOGO[] = {
-  10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-  20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-  30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-  40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-  50, 51
-};
+const static uint8_t LEDS_BACK[] = {1, 3, 5, 7, 9, 11};
 
 SoftwareSerial rs485(PIN_SERIAL_RX, PIN_SERIAL_TX);
 
 uint8_t hue = 0;
-bool show_food_ready = 0;
 bool power = 1;
+bool show_front = 1;
+bool show_back = 1;
 
 String inputCommand = "";
 bool commandReady = false;
@@ -56,11 +46,19 @@ void handle_command() {
       }
     break;
 
-    case 'S':
+    case 'B':
       if (param == "on") {
-        show_food_ready = true;
+        show_back = true;
       } else if (param == "off") {
-        show_food_ready = false;
+        show_back = false;
+      }
+    break;
+
+    case 'F':
+      if (param == "on") {
+        show_front = true;
+      } else if (param == "off") {
+        show_front = false;
       }
     break;
   }
@@ -101,13 +99,17 @@ void loop() {
 
   EVERY_N_MILLIS(64) {
     if (power) {
-      set_group(LEDS_LOGO, sizeof(LEDS_LOGO), CHSV(hue, 255, 255));
+      if (show_front) {
+        set_group(LEDS_FRONT, sizeof(LEDS_FRONT), CHSV(hue, 255, 255));
+      } else {
+        set_group(LEDS_FRONT, sizeof(LEDS_FRONT), CHSV(0, 0, 0));
+      }
 
-      if (show_food_ready) {
-        set_group(LEDS_FOOD_READY, sizeof(LEDS_FOOD_READY),
+      if (show_back) {
+        set_group(LEDS_BACK, sizeof(LEDS_BACK),
                   CHSV(hue + 128 /* wrap */, 255, 255));
       } else {
-        set_group(LEDS_FOOD_READY, sizeof(LEDS_FOOD_READY),
+        set_group(LEDS_BACK, sizeof(LEDS_BACK),
                   CHSV(0, 0, 0));
       }
       FastLED.show();
