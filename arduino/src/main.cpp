@@ -100,7 +100,7 @@ void loop() {
   EVERY_N_MILLIS(64) {
     if (power) {
       if (show_front) {
-        set_group(LEDS_FRONT, sizeof(LEDS_FRONT), CHSV(hue, 255, 255));
+        set_group(LEDS_FRONT, sizeof(LEDS_FRONT), CHSV(96, 255, 255));
       } else {
         set_group(LEDS_FRONT, sizeof(LEDS_FRONT), CHSV(0, 0, 0));
       }
